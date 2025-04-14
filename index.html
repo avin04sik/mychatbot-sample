@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>My AI Chat</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    #chatbox { width: 100%; max-width: 600px; margin: auto; }
+    #messages { border: 1px solid #ccc; padding: 10px; height: 400px; overflow-y: auto; background: white; }
+    #input { width: 80%; padding: 10px; }
+    #send { padding: 10px; }
+  </style>
+</head>
+<body>
+  <h2>🤖 My AI Chat</h2>
+  <div id="chatbox">
+    <div id="messages"></div>
+    <input id="input" type="text" placeholder="Ask something..." />
+    <button id="send">Send</button>
+  </div>
+
+  <script>
+    const messagesDiv = document.getElementById('messages');
+    const input = document.getElementById('input');
+    const sendBtn = document.getElementById('send');
+
+    sendBtn.onclick = async () => {
+      const userMsg = input.value.trim();
+      if (!userMsg) return;
+
+      messagesDiv.innerHTML += `<p><b>You:</b> ${userMsg}</p>`;
+      input.value = "";
+
+      try {
+        const response = await fetch("http://localhost:3000/chat", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({ message: userMsg })
+        });
+
+        const data = await response.json();
+        const reply = data.reply || "No response.";
+        messagesDiv.innerHTML += `<p><b>AI:</b> ${reply}</p>`;
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+      } catch (error) {
+        messagesDiv.innerHTML += `<p style=\"color: red;\"><b>Error:</b> ${error.message}</p>`;
+      }
+    };
+  </script>
+</body>
+</html>
